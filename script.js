@@ -32,7 +32,7 @@ async function predictHeartDisease() {
     ];
 
     try {
-        const response = await fetch('http://localhost:3000/predict', {
+        const response = await fetch('/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ features: features })
