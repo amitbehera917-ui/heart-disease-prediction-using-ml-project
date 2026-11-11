@@ -1,22 +1,36 @@
 import sys
 import pickle
 import warnings
+from pathlib import Path
 
-# Ignore warnings
 warnings.filterwarnings("ignore")
 
+# Get project directory
+BASE_DIR = Path(__file__).resolve().parent
+
+# Model file path
+MODEL_PATH = BASE_DIR / "heart_disease_model.pkl"
+
 try:
-    # Get input data passed from Node.js
+    # Read input features from Node.js
     input_data = [float(x) for x in sys.argv[1:]]
 
-    # Load the trained model
-    model = pickle.load(open('heart_disease_model.pkl', 'rb'))
+    # Validate feature count
+    if len(input_data) != 13:
+        raise ValueError(
+            f"Expected 13 features, received {len(input_data)}"
+        )
 
-    # Make a prediction (0 = No Heart Disease, 1 = Heart Disease)
+    # Load trained ML model
+    with open(MODEL_PATH, "rb") as file:
+        model = pickle.load(file)
+
+    # Generate prediction
     prediction = model.predict([input_data])
 
-    # Print the result so Node.js can read it
-    print(prediction[0])
+    # Print only prediction for Node.js
+    print(int(prediction[0]))
 
 except Exception as e:
-    print("Error:", e)
+    print(f"Prediction Error: {e}", file=sys.stderr)
+    sys.exit(1)
